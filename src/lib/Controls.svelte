@@ -109,6 +109,7 @@ function downloadRole()
         <label for="aggregate">Aggregate roles:</label>
         <Tags
         name="aggregate"
+        disable={!$roleObject.clustered}
         bind:tags={$roleObject.aggregateRoles}
         />
     </div>
@@ -126,6 +127,7 @@ function downloadRole()
 <Editor bind:roleYaml={yaml} bind:this={showPreview}/>
 <style>
 .config{
+  grid-row: 2 / 3;
     font-family: Rubik;
     background: var(--default-wiget-background);
     display: flex;

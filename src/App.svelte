@@ -50,6 +50,7 @@
 <div class="add-rule"><button on:click="{addRule}"></button></div>
 </div>
 </div>
+<span class="made-with-svelte"><a target="_blank" href="https://svelte.dev/">Made with Svelte <span style="color:red;">❤</span></a></span>
 </div>
 </main>
 
@@ -66,10 +67,16 @@
     --defult-lines-color: #d1d1d1; 
   }
 
+  :global(a)
+  {
+    color:white;
+    text-decoration: none;
+  }
+
 .layout{
   display: grid;
   grid-template-columns: 350px auto;
-  grid-template-rows: 60px auto;
+  grid-template-rows: 60px auto 25px;
   height: 100vh;
   width: 100vw;
 }
@@ -79,6 +86,19 @@
     --default-color-headers: #f3f0f0; 
     --default-background-menu: #000212;
     --defult-lines-color:#5e5e5e;
+}
+
+.made-with-svelte{
+  grid-column: 1 / 3;
+  grid-row: 3 / 4;
+  background: rgb(31, 31, 31);
+  display: flex;
+  color: white;
+  font-family: Rubik;
+  font-size: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .add-rule{
