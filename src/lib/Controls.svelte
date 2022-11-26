@@ -3,12 +3,15 @@ import download from '../assets/download.svg'
 import preview from '../assets/preview.svg'
 import upload from '../assets/upload.svg'
 import svelteIcon from '../assets/svelte.png'
+import Styles from './styles.css'
+import DownloadWindow from './DownloadWindow.svelte';
 import Editor from './Editor.svelte';
 import RoleTips from './RoleTips.svelte'
 import { roleObject } from './store.js';
 import Tags from "svelte-tags-input";
 
 let showPreview;
+let showDownload;
 let yaml;
 let files;
 export let rules; 
@@ -46,6 +49,17 @@ function generateRole(){
   }
   generatedRoleObject["rules"] = rules;
   return generatedRoleObject
+}
+
+function generateRoleBinding()
+{
+  let generatedRoleObject = {
+  "apiVersion":"rbac.authorization.k8s.io/v1",
+  "kind":"roleBinding",
+  "metadata":{
+    "name":rolebindingName,
+  }
+}
 
 }
 
@@ -54,6 +68,11 @@ function previewRole()
   let generatedRoleObject = generateRole()
   showPreview.show()
   yaml = jsyaml.dump(generatedRoleObject)
+}
+
+function showDownloadWindow()
+{
+  showDownload.show()
 }
 
 function loadRole(file)
@@ -114,7 +133,7 @@ function downloadRole()
         />
     </div>
     <div class="buttons">
-      <button on:click={downloadRole} class="download blueboy"><img src={download}/> Download </button>
+      <button on:click={showDownloadWindow} class="download blueboy"><img src={download}/> Generate </button>
       <label class="preview blueboy" ><img src={upload}/> Upload 
         <input bind:files={files} accept="text/x-yaml" style="display: none;" type="file"/>
       </label>
@@ -125,6 +144,7 @@ function downloadRole()
 
 </div>
 <Editor bind:roleYaml={yaml} bind:this={showPreview}/>
+<DownloadWindow bind:this={showDownload} namespace={$roleObject.namespace} clustered={$roleObject.clustered} roleName={$roleObject.name}/>
 <style>
 .config{
   grid-row: 2 / 3;
@@ -152,49 +172,12 @@ hr{
 }
 
 
-.blueboy{
-    color: white;
-    margin: 0.5rem 1rem 0.2rem 0;
-    border:none;
-    border-radius: 12px;
-    display: flex;
-    width: fit-content;
-    align-items: center;
-    background: var(--default-background-menu);
-    font-size: 1rem;
-    padding: 0.6rem 1.5rem 0.6rem 0.8rem;
-}
-
-.blueboy:hover{
-  background-color: #0063b4;
-  transition-duration: 0.4s;
-}
-
-.blueboy img{
-  height: 1.4rem;
-  margin-right: 0.3rem;
-}
-
 .buttons {
   display: flex;
   margin-top: 1rem;
   flex-wrap: wrap;
 }
 
-.blueboy:hover{
-    cursor: pointer;
-}
-
-.config input[type=text]{
-    padding: 0.6rem 0.4rem;
-    padding-left: 1rem;
-    font-size: var(--default-text);
-    background-color: white;
-    border-radius: 8px;
-    margin-bottom: 0.8rem;
-    color: black;
-    border: 1px solid rgb(204, 204, 204);
-}
 
 .config :global(.svelte-tags-input-layout){
   border-radius: 8px;
@@ -208,70 +191,4 @@ input:focus{
   background-color: rgb(233, 229, 229) !important;
 }
 
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    margin-top: 0.4rem;
-    scale: 0.7;
-    height: 34px;
-  }
-
-  .switch p{
-    position: absolute;
-    top:50%;
-    left:100%;
-    font-size: 1.4rem;
-    margin: 0 0.8rem;
-    width: max-content;
-    transform: translate(0,-50%);
-  }
-  
-  .switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    border-radius: 34px;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    border-radius: 50%;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-  
 </style>

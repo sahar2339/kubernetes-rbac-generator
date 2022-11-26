@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 //export const namespace = writable()
 //export const roleName = writable()
 
-export const roleObject = writable(JSON.parse(localStorage.getItem("roleObject")) || {"name":"My Role", "rules": [{
+export const roleObject = writable(JSON.parse(localStorage.getItem("roleObject")) || {"name":"My Role", "namesapce":"", "rules": [{
     "apiGroups":[],
     "resources": [],
     "resourceNames": [],
