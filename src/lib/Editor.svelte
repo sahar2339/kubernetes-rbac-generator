@@ -1,6 +1,4 @@
 <script>
-    import CodeMirror from "svelte-codemirror-editor";
-    import { yaml } from "@codemirror/legacy-modes/mode/yaml";
     export let roleYaml;
     let shown;
 

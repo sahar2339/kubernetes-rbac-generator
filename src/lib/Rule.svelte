@@ -2,6 +2,7 @@
 import Duplicate from '../assets/duplicate.svg'
 import Delete from '../assets/delete.svg'
 import Tags from "svelte-tags-input";
+import Styles from './styles.css'
 import { roleObject } from './store.js';
 import eye from '../assets/eye.svg';
 
@@ -258,13 +259,6 @@ const handleKindInput = (event) => {
     background-color: rgb(250, 246, 246);
     opacity: 0.5;
     cursor: pointer;
-}
-
-.inputs :global(.svelte-tags-input-tag){
-    background-color: rgb(212, 219, 241);
-    color: black;
-    font-family: Rubik;
-    font-size: var(--default-text);
 }
 
 .inputs .inputWrapper{
