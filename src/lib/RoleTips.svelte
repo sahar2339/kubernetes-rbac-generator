@@ -61,7 +61,7 @@ $:{
 }
 
 </script>
-<span class="Headline">{tips.length} Role Insights</span>
+<span class="Headline">{tips.length} Role {tips.length === 1 ? 'Insight' : 'Insights'} </span>
 <div class="roleTips">
     {#each tips as tip}
     <div class="tip {tip.type}"><img src={TipsIcon[tip.type]}/>{tip.detail}</div>

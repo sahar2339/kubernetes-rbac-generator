@@ -4,7 +4,6 @@ import Delete from '../assets/delete.svg'
 import Tags from "svelte-tags-input";
 import Styles from './styles.css'
 import { roleObject } from './store.js';
-import eye from '../assets/eye.svg';
 
 export let apiVersions;
 export let kinds;
@@ -13,27 +12,40 @@ export let names;
 export let verbs;
 export let deleteRule;
 export let duplicateRule;
+export let nonResourceURLs;
+let isNonResource = false;
 let readOnly = false;
 let isClusteredRole;
+let wildcard;
 
 let resourceVerbs = ["Get","Watch","List","Create","Delete","Patch","update","deletecollection"]
 let HTTPVerbs = ["get","head","post","put","patch","delete"]
 let rbacVerbs = ["bind","escalate"] 
 let authenticationVerbs = ["impersonate"]
 let verbsOptions = [...resourceVerbs]
+if(nonResourceURLs != undefined)
+    isNonResource = true
+if(isNonResource)
+{
+    verbsOptions = [...HTTPVerbs]
+}
 
 $: {
-    if(apiVersions.includes("authentication.k8s.io"))
+    wildcard = verbs.includes('*') 
+    if(!isNonResource)
     {
-        verbsOptions = [...resourceVerbs, ...authenticationVerbs]
-    }
-    else if(apiVersions.includes("rbac.authorization.k8s.io/v1") || apiVersions.includes("rbac.authorization.k8s.io") )
-    {
-        verbsOptions = [...resourceVerbs, ...rbacVerbs]
-    }
-    else
-    {
-        verbsOptions = [...resourceVerbs]
+        if(apiVersions.includes("authentication.k8s.io"))
+        {
+            verbsOptions = [...resourceVerbs, ...authenticationVerbs]
+        }
+        else if(apiVersions.includes("rbac.authorization.k8s.io/v1") || apiVersions.includes("rbac.authorization.k8s.io") )
+        {
+            verbsOptions = [...resourceVerbs, ...rbacVerbs]
+        }
+        else
+        {
+            verbsOptions = [...resourceVerbs]
+        }
     }
 }
 
@@ -73,7 +85,10 @@ const clusteredResources = {
 }
 
 $:{
-    readOnly =  verbs.every(elem => ["Get","Watch","List"].includes(elem))
+    if(!isNonResource)
+        readOnly =  verbs.every(elem => ["Get","Watch","List"].includes(elem))
+    else
+        readOnly =  verbs.every(elem => ["get","head"].includes(elem))
 }
 
 let kindsAutoComplete = Object.values(namespacedResources).flat();
@@ -142,6 +157,19 @@ const handleKindInput = (event) => {
 }
 
 
+const HandleWildcardChecked = (event) => {
+    if(wildcard)
+    {
+        verbs = ['*']
+
+    }else
+    {
+        verbs = []
+    }
+    verbs = verbs
+}
+
+
 
 </script>
     
@@ -151,13 +179,14 @@ const handleKindInput = (event) => {
     <span class="readOnly">Read-only </span>
     {/if}
     <div class="inputs">
-        <div class="inputWrapper tagsWrapper">
+    {#if !isNonResource}
+        <div  class="inputWrapper tagsWrapper">
         <label for="api-versions">Api Groups :</label>   
         <Tags
         autoComplete={apiextensionsAutoComplete}
         name="api-versions"
         bind:tags={apiVersions}
-        placeholder="Detected by kind"
+        placeholder="Detected by resource"
         />
     </div>
     <div class="inputWrapper tagsWrapper">
@@ -176,11 +205,24 @@ const handleKindInput = (event) => {
     bind:tags={names}
     />
 </div>
+{:else}
+<div class="inputWrapper">
+    <label for="names">nonResourceURLs:</label>
+    <Tags 
+    name="nonResourceURLs"
+    bind:tags={nonResourceURLs}
+    />
+</div>
+{/if}
+<div class="resource-verbs-wrapper">
+    <label style="margin-left: 5px;" for="all"><input name="all" bind:group={verbs} on:change={HandleWildcardChecked} value="*" type="checkbox"/> * </label>
     <div class="resource-verbs">
         {#each verbsOptions as verb}
-        <label for={verb}><input value={verb} bind:group={verbs} name={verb} type="checkbox">{verb}</label>
+        <label for={verb}><input value={verb} disabled={wildcard} bind:group={verbs} name={verb} type="checkbox">{verb}</label>
         {/each}
     </div>
+</div>
+
 </div>
     <button on:click={duplicateRule(index)} class="delete clear-btn" value="duplicate"><img src={Duplicate}></button>
     <button on:click={deleteRule(index)} class="clear-btn" value="delete"><img src={Delete}></button>
@@ -241,12 +283,18 @@ const handleKindInput = (event) => {
     border-radius: 50%;
 }
 
+.resource-verbs-wrapper{
+    margin-left: auto;
+    margin-right: 0;
+}
+
 .resource-verbs{
     display: flex;
     flex-wrap: wrap;
+    border: 1px solid rgb(226, 226, 226);
+    border-radius: 5px;
+    padding: 5px;
     justify-content: left;
-    margin-left: auto;
-    margin-right: 0;
     width: 12rem;
 }
 

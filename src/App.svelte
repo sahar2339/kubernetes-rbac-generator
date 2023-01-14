@@ -1,8 +1,11 @@
 <script>
+// @ts-nocheck
+
   import fonts from './lib/fonts.css'
   import Controls from './lib/Controls.svelte'
   import Rule from './lib/Rule.svelte'
   import {roleObject} from './lib/store'
+    import { loop_guard } from 'svelte/internal';
  
   function addRule()
   {
@@ -42,12 +45,18 @@
 </div>
 <Controls bind:rules={$roleObject.rules}/>
 <div class="rules-container">
-<div class="rules-header"><h2>{$roleObject.rules.length} Rules</h2></div>
+<div class="rules-header"><h2>{$roleObject.rules.length} {$roleObject.rules.length == 1 ? 'Rule' : 'Rules'}</h2></div>
 <div class="rulesWrapper">
 {#each $roleObject.rules as rule, index}
+  {#if rule.nonResourceURLs== undefined}
   <Rule bind:apiVersions={rule.apiGroups} bind:kinds={rule.resources} bind:names={rule.resourceNames} bind:verbs={rule.verbs} deleteRule={deleteRule} duplicateRule={addRuleFromObject} index={index} />
+  {:else}
+  <Rule bind:nonResourceURLs={rule.nonResourceURLs} bind:verbs={rule.verbs} deleteRule={deleteRule} duplicateRule={addRuleFromObject} index={index} />
+  {/if}
 {/each}
-<div class="add-rule"><button on:click="{addRule}"></button></div>
+<div class="add-rule">
+  <button>Non resource rule</button>
+  <button class="add-rule-btn" on:click="{addRule}"></button></div>
 </div>
 </div>
 <span class="made-with-svelte"><a target="_blank" href="https://svelte.dev/">Made with Svelte <span style="color:red;">❤</span></a></span>
@@ -105,11 +114,12 @@
   width:100%;
   display: flex;
   justify-content: center;
+  position: relative;
   align-items: center;
   border: 2px dotted rgba(145, 145, 145,0.4);
 }
 
-.add-rule button{
+.add-rule-btn{
   background-image: url('./assets/plus.svg');
   background-position: 50% 50%;
   height: 10rem;
